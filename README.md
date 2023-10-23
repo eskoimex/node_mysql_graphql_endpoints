@@ -15,9 +15,8 @@ git@github.com:eskoimex/node_mysql_graphql_endpoints.git
 ```
 
 ## Running locally, run the following commands
-npm install
-node server.js
+- npm install,
+- node server.js
 
 ## to run the swagger documentaion
 node swagger.js
-```
