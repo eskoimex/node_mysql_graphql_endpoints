@@ -1,0 +1,57 @@
+CREATE DATABASE test;
+
+-- 1. Set up database schema
+USE test;
+
+CREATE TABLE Users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Orders (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    total DECIMAL(10, 2),
+    FOREIGN KEY (user_id) REFERENCES Users(id)
+);
+
+
+-- 2. Data Insertion
+
+USE test;
+
+-- Insert 1000 users
+INSERT INTO Users (username, email)
+SELECT CONCAT('user', id), CONCAT('user', id, '@example.com')
+FROM (
+    SELECT @row_number:=@row_number+1 AS id
+    FROM (SELECT @row_number:=0) AS t
+    CROSS JOIN Users AS u
+    LIMIT 1000
+) AS tmp;
+
+-- Insert 5000 orders
+INSERT INTO Orders (user_id, total)
+SELECT u.id, CURDATE(), RAND() * 100
+FROM Users AS u
+CROSS JOIN (
+    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+) AS numbers
+LIMIT 5000;
+
+
+
+
+USE test;
+
+SELECT u.username, COUNT(*) AS order_count
+FROM Users AS u
+JOIN Orders AS o ON u.id = o.user_id
+GROUP BY u.id
+ORDER BY order_count DESC
+LIMIT 10;
+
+
+-- 3. Query Optimization : To optimize the query for performance, ensure that appropriate indexes are created on the relevant columns
+CREATE INDEX idx_user_id ON Orders (user_id);
